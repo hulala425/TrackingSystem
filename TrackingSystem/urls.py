@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls, name='admin'),
 
     url(r'^download_stu_info/' + stu_search_options,\
-        views.download_stu_info, name = 'download_stu_info'),
+        views.download_stu_info, name='download_stu_info'),
     url(r'^get_tmp_file/(?:type=(?P<content_type>.+)/)(?:path=(?P<file_path>.+))$',\
         views.get_tmp_file, name='get_tmp_file'),
 
@@ -87,7 +87,7 @@ urlpatterns = [
     url(r'^students/add/$', views.create_stu, name='create_stu'),
     url(r'^students/parse/$', views.parse_stu, name='parse_stu'),
 
-    url(r'^students/degree_info/(?P<id>\d+)/$', views.degree_info, name = 'degree_info'), 
+    url(r'^students/degree_info/(?P<id>\d+)/$', views.degree_info, name='degree_info'),
     url(r'^student/(?:(?P<stu_id>\d+)/)degrees/(?:(?P<option>[a-z_]+)/)?(?:(?P<id>\d+)/)?$',\
         views.degrees, name='degrees'),
     url(r'^degree/(?:(?P<deg_id>\d+)/)quals/(?:(?P<option>[a-z_]+)/)?(?:(?P<id>\d+)/)?$',\
@@ -97,7 +97,8 @@ urlpatterns = [
 
     url(r'^upload/$', views.upload, name='upload'),
     url(r'^form_upload/$', views.form_upload, name='form_upload'),
-
+    url(r'^students/doc_upload/(?P<id>\d+)/$', views.doc_upload, name='doc_upload'),
+    url(r'^students/doc_remove/(?P<id>\d+)/$', views.doc_remove, name='doc_remove'),
     url(r'^students/advising_note/(?P<id>\d+)/$', views.advising_note, name='advising_note'),
     #url(r'^students/advising_note/$', views.advising_note, name='advising_note'),
     # degree docs
@@ -124,7 +125,7 @@ urlpatterns = [
     url(r"^(?P<file_path>.+)$", views.serve_protected_document, name='decrypt_and_serve'),
 
 ]
- # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:
 #     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

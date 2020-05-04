@@ -8,6 +8,7 @@ from .sel_options import STUDENT_STATUS_TYPE, GENDER, ETHNICITY_TYPE,\
     US_RESIDENCY_TYPE, TEXAS_RESIDENCY_TYPE, CITIZENSHIP,\
     SEMESTER_TYPE, DEGREE_TYPE, MAJOR_TYPE, YES_NO_TYPE
 
+
 class stu_search_form(forms.Form):
     uin = forms.CharField(label='UIN', max_length=63, required=False,
                           widget=forms.TextInput(attrs={'class': 'w3-input w3-cell', 'style': 'width:auto'}))
@@ -104,19 +105,15 @@ def create_doc_form(model_in, type_widget=0, extra_fields=[]):
     '''
     class Meta:
         model = model_in        # model input
-        fields = ['doc_type', 'doc', 'notes', 'appr_cs_date', 'appr_ogs_date']
+        fields = ['deg_type', 'doc_type', 'doc', 'notes']
         widgets = {
+            'deg_type': forms.Select(attrs={'class': 'w3-select w3-cell', 'style': 'width: auto;'}),
             'doc_type': forms.Select(attrs={'class': 'w3-select'})
             if type_widget == 0 else
             forms.TextInput(attrs={'class': 'w3-input'}),
             'notes': forms.Textarea(attrs={'cols': 15, 'rows': 5}),
-            'appr_cs_date': forms.SelectDateWidget
-            (attrs={'class': 'w3-select'},
-             years=[y for y in range(timezone.now().year - 7, timezone.now().year + 8)]),
-            'appr_ogs_date': forms.SelectDateWidget
-            (attrs={'class': 'w3-select'},
-             years=[y for y in range(timezone.now().year - 7, timezone.now().year + 8)])
         }
+
     for field in extra_fields:
         Meta.fields.append(field[0])
         Meta.widgets[field[0]] = field[1]
@@ -128,6 +125,7 @@ def create_doc_form(model_in, type_widget=0, extra_fields=[]):
 
     return _model_form_class    # return a class
 
+
 class advising_note_form(forms.ModelForm):
     class Meta:
         model = Advising_Note        # model input
@@ -135,7 +133,6 @@ class advising_note_form(forms.ModelForm):
         widgets = {
             'note': forms.Textarea(attrs={'cols': 128, 'rows': 32, 'style': "width:80%"}),
         }
-    
 
 
 class pre_exam_info_form(forms.ModelForm):
@@ -201,4 +198,4 @@ class DocumentForm(forms.Form):
     docfile = forms.FileField(
         label='Select a file',
         help_text='max. 42 megabytes'
-        )
+    )
