@@ -71,6 +71,36 @@ def form_upload(request):
 
 
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
+def doc_upload(request, id):
+    student = Student.objects.get(id=id)
+    if request.method == 'POST':
+        form = create_doc_form(Deg_Plan_Doc)(request.POST, request.FILES)
+        if form.is_valid():
+            doc = form.save(commit=False)
+            doc.stu = student
+            doc.save()
+            return redirect('doc_upload', id=id)
+    else:
+        student = Student.objects.get(id=id)
+        form = create_doc_form(Deg_Plan_Doc)
+    return render(request, 'form_upload.html', {
+        'form': form,
+        'student': student,
+    })
+
+
+@conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
+def doc_remove(request, id):
+    doc = Deg_Plan_Doc.objects.get(id=id)
+    stu_id = doc.stu.id
+    if request.method == "POST":
+
+        doc.delete()
+
+    return redirect('doc_upload', id=stu_id)
+
+
+@conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
 def degree_plan(request, deg_id, option='', id=0):
     if request.method == 'POST':
         if not permission_check(request, Deg_Plan_Doc, option):
@@ -363,11 +393,12 @@ def create_stu(request, back_url=None):
             'title': title,
         })
 
+
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
 def parse_stu(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():     
+        if form.is_valid():
             # newdoc = DocumentFile(docfile = request.FILES['docfile'])
             # newdoc.save()
             csv_file = request.FILES['docfile']
@@ -378,7 +409,8 @@ def parse_stu(request):
             data = csv.DictReader(decoded_file)
             # check if any columns in the csv file is what we want
             headers = data.fieldnames
-            parsed_lis = [' UIN', ' Email', ' Name', '  Start Semester', ' Current Degree', ' Gender', '  Advisor']
+            parsed_lis = [' UIN', ' Email', ' Name', '  Start Semester',
+                          ' Current Degree', ' Gender', '  Advisor']
             intersection = [i for i in headers if i in parsed_lis]
             if not intersection:
                 messages.error(request, 'NO COLUMN MATCH IN THIS CSV FILE')
@@ -396,7 +428,7 @@ def parse_stu(request):
                 print(start_detail)
                 student.start_sem = start_detail[0]
                 student.start_year = start_detail[1]
-                # cur_degree is onetoone field, need to create Degree instance 
+                # cur_degree is onetoone field, need to create Degree instance
                 # student.cur_degree = row[' Current Degree'] ??
                 student.gender = row[' Gender']
                 student.advisor = row['  Advisor']
@@ -440,13 +472,14 @@ def edit_stu(request, id, back_url=None):
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
 def show_stu(request, id):
     try:
-        student = Student.objects.get(pk = id)
+        student = Student.objects.get(pk=id)
     except Student.DoesNotExist:
         raise Http404("Student does not exist.")
     context = {
         'stu': student
-    }   
+    }
     return render(request, 'show_stu.html', context)
+
 
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
 def advising_note(request, id):
@@ -454,12 +487,12 @@ def advising_note(request, id):
         form = advising_note_form(request.POST)
         if form.is_valid():
             note = form.cleaned_data['note']
-            stu = Student.objects.get(pk = id)
+            stu = Student.objects.get(pk=id)
             firstName = stu.first_name
             lastName = stu.last_name
-            advisingNote = Advising_Note(first_name = firstName, last_name = lastName, note = note)
+            advisingNote = Advising_Note(first_name=firstName, last_name=lastName, note=note)
             advisingNote.save()
-            return redirect('advising_note', id = id)
+            return redirect('advising_note', id=id)
     else:
         form = advising_note_form()
         advisingNotes = Advising_Note.objects.all()
@@ -468,19 +501,19 @@ def advising_note(request, id):
         'advising_notes': advisingNotes,
     })
 
+
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
 def degree_info_more(request, id):
     try:
-        degree = Degree.objects.get(id = id)
+        degree = Degree.objects.get(id=id)
     except Degree.DoesNotExist:
         raise Http404("Degree does not exist.")
-    student = Student.objects.get(pk = degree.stu.id)
+    student = Student.objects.get(pk=degree.stu.id)
     context = {
         'deg': degree,
         'stu': student,
-    }   
+    }
     return render(request, 'degree_info_more.html', context)
-
 
 
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)

@@ -10,6 +10,12 @@ from .sel_options import GENDER, ETHNICITY_TYPE, US_RESIDENCY_TYPE,\
     ANNUAL_REVIEW_DOC_TYPE, ANNUAL_REVIEW_STATUS_TYPE
 from django.core.files.storage import FileSystemStorage
 import os
+from gdstorage.storage import GoogleDriveStorage
+
+
+# Define Google Drive Storage
+gd_storage = GoogleDriveStorage()
+
 
 class Student(models.Model):
     uin = models.CharField(max_length=63, blank=False, unique=True, verbose_name='UIN')
@@ -38,7 +44,7 @@ class Student(models.Model):
     upe = models.CharField(max_length=15, default='no', choices=YES_NO_TYPE, verbose_name='UPE')
     ace = models.CharField(max_length=15, default='no', choices=YES_NO_TYPE, verbose_name='ACE')
     iga = models.CharField(max_length=15, default='no', choices=YES_NO_TYPE, verbose_name='IGA')
-    propos_date = models.CharField(max_length=30, blank=False,
+    propos_date = models.CharField(max_length=30, blank=True,
                                    null=True, verbose_name='Proposal Date')
 
     class Meta:
@@ -69,16 +75,19 @@ class Degree(models.Model):
     class Meta:
         verbose_name = 'Degree'
 
+
 class DocumentFile(models.Model):
     docfile = models.FileField(upload_to='documents/')
     # docfile = models.FileField(storage=FileSystemStorage(location=settings.MEDIA_ROOT), upload_to='documents/', default='settings.MEDIA_ROOT/documents/anonymous.csv')
 
+
 class Qual(models.Model):
-    result = models.CharField(max_length=63, choices=Qual_RESULT_TYPE, default='Pass', verbose_name='Result')
+    result = models.CharField(max_length=63, choices=Qual_RESULT_TYPE,
+                              default='Pass', verbose_name='Result')
     date_year = models.SmallIntegerField(blank=False, default=0, verbose_name='Exam Date Year',
-                                              validators=[MaxValueValidator(32767), MinValueValidator(-32768)])
+                                         validators=[MaxValueValidator(32767), MinValueValidator(-32768)])
     date_sem = models.CharField(max_length=31, choices=SEMESTER_TYPE,
-                                     default='fall', verbose_name='Exam Date Semester')
+                                default='fall', verbose_name='Exam Date Semester')
     deg = models.ForeignKey(Degree, related_name='quals',
                             on_delete=models.CASCADE, verbose_name='Degree')
 
@@ -87,20 +96,18 @@ class Qual(models.Model):
 
 
 class Document(models.Model):
-    doc = EncryptedFileField(upload_to='documents/', verbose_name='Document')
+    doc = models.FileField(upload_to='documents/', storage=gd_storage, verbose_name='Document')
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name='Uploaded at')
-    appr_cs_date = models.DateField(
-        blank=True, null=True, verbose_name='Aprroved CS')  # Approved CS Date
-    appr_ogs_date = models.DateField(
-        blank=True, null=True, verbose_name='Aprroved OGS')  # Approved OGS Date
     notes = models.CharField(max_length=511, blank=True, verbose_name='Notes')
-    degree = models.ForeignKey(Degree, models.CASCADE, verbose_name='Degree')
+    deg_type = models.CharField(max_length=63, choices=DEGREE_TYPE,
+                                default='none', verbose_name='Degree')
 
     class Meta:
         abstract = True
 
+
 class Advising_Note(models.Model):
-    date = models.DateField(blank = True, null = True, auto_now = True)
+    date = models.DateField(blank=True, null=True, auto_now=True)
     first_name = models.CharField(max_length=127, blank=True, verbose_name='First Name')
     last_name = models.CharField(max_length=127, blank=True, verbose_name='Last Name')
     note = models.CharField(max_length=4096, blank=True, verbose_name='Note')
@@ -112,6 +119,8 @@ class Advising_Note(models.Model):
 class Deg_Plan_Doc(Document):
     doc_type = models.CharField(max_length=255, choices=DEGREE_PLAN_DOC_TYPE,
                                 default='not_sel', verbose_name='Document Type')
+    stu = models.ForeignKey(Student, related_name='deg_plan_docs',
+                            on_delete=models.CASCADE, verbose_name='Student')
 
     class Meta:
         verbose_name = 'Degree Plan'
@@ -224,7 +233,7 @@ class Session_Note(models.Model):
         verbose_name = 'Session Note'
 
 
-@receiver(models.signals.post_delete, sender=Deg_Plan_Doc)
+# @receiver(models.signals.post_delete, sender=Deg_Plan_Doc)
 @receiver(models.signals.post_delete, sender=Pre_Exam_Doc)
 @receiver(models.signals.post_delete, sender=T_D_Prop_Doc)
 @receiver(models.signals.post_delete, sender=T_D_Doc)
