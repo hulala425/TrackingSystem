@@ -107,8 +107,6 @@ urlpatterns = [
         views.preliminary_exam, name='preliminary_exam'),
     url(r'^degree/(?:(?P<deg_id>\d+)/)qualifying_exam/(?:(?P<option>[a-z_]+)/)?(?:(?P<id>\d+)/)?$',\
         views.qualifying_exam, name='qualifying_exam'),
-    url(r'^degree/(?:(?P<deg_id>\d+)/)qualifying_exam_new/(?:(?P<option>[a-z_]+)/)?$',\
-        views.qualifying_exam_new, name='qualifying_exam_new'),
     # url(r'^students/qualifying_exam_new/(?P<id>\d+)/$', views.qualifying_exam_new, name='qualifying_exam_new'),
     url(r'^degree/(?:(?P<deg_id>\d+)/)annual_review/(?:(?P<option>[a-z_]+)/)?(?:(?P<id>\d+)/)?$',\
         views.annual_review, name='annual_review'),

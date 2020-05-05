@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.static import serve
 
-from .models import Deg_Plan_Doc, Student, Degree, Qual, Pre_Exam_Doc, Pre_Exam_Info, Qual_Exam_Info,\
+from .models import Deg_Plan_Doc, Student, Degree, Qual, Pre_Exam_Doc, Pre_Exam_Info,\
     T_D_Prop_Doc, Fin_Exam_Info, Fin_Exam_Doc, T_D_Doc, T_D_Info, Session_Note,\
     Other_Doc, Qual_Exam_Doc, Annual_Review_Doc, DocumentFile, Advising_Note
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -315,8 +315,8 @@ def students(request, **kwargs):  # uin, first_name, last_name, gender, status, 
             students = students.filter(**seach_dict)
         students = students.order_by('uin')
         if not students:
-        #     print('hei')
-            return render(request,'NotFind.html')
+            if search_form_params:
+                return render(request,'NotFind.html')
         form = stu_search_form(search_form_params)
         paginator = Paginator(students, 20)  # Show 20 students per page. Use 1 for test.
         page = request.GET.get('page')
