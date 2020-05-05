@@ -10,11 +10,6 @@ from .sel_options import GENDER, ETHNICITY_TYPE, US_RESIDENCY_TYPE,\
     ANNUAL_REVIEW_DOC_TYPE, ANNUAL_REVIEW_STATUS_TYPE
 from django.core.files.storage import FileSystemStorage
 import os
-from gdstorage.storage import GoogleDriveStorage
-
-
-# Define Google Drive Storage
-gd_storage = GoogleDriveStorage()
 
 
 class Student(models.Model):
@@ -121,9 +116,18 @@ class Deg_Plan_Doc(Document):
                                 default='not_sel', verbose_name='Document Type')
     stu = models.ForeignKey(Student, related_name='deg_plan_docs',
                             on_delete=models.CASCADE, verbose_name='Student')
+    file_id = models.CharField(max_length=127, blank=False, verbose_name='File Id')
 
     class Meta:
         verbose_name = 'Degree Plan'
+
+    def delete(self, *args, **kwargs):
+        a = self.doc.path.split("/")
+        b = "/".join(a[1:4]+a[6:])
+        if os.path.isfile("/"+b):
+            os.remove("/"+b)
+
+        super(Deg_Plan_Doc, self).delete(*args, **kwargs)
 
 
 class Pre_Exam_Doc(Document):

@@ -23,6 +23,9 @@ from .functions import deg_doc, get_info_form, get_stu_objs, get_deg_objs, post_
     delete, get_stu_search_dict, permission_check
 
 from openpyxl import Workbook
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from django.views.static import serve
 import pandas as pd
 import csv
 import os
@@ -98,6 +101,66 @@ def doc_remove(request, id):
         doc.delete()
 
     return redirect('doc_upload', id=stu_id)
+
+
+@conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
+def tamu_upload(request, id):
+    student = Student.objects.get(id=id)
+    g_login = GoogleAuth()
+    g_login.LoadCredentialsFile("mycreds.txt")
+    if g_login.credentials is None:
+        g_login.CommandLineAuth()
+    elif g_login.access_token_expired:
+        g_login.Refresh()
+    else:
+        g_login.Authorize()
+    g_login.SaveCredentialsFile("mycreds.txt")
+    drive = GoogleDrive(g_login)
+    if request.method == 'POST':
+        form = create_doc_form(Deg_Plan_Doc)(request.POST, request.FILES)
+        if form.is_valid():
+            doc = form.save(commit=False)
+            doc.stu = student
+            doc.save()
+            # print("./media/"+ str(doc.doc))
+            with open("./media/" + str(doc.doc), "rb") as file:
+                file_drive = drive.CreateFile({'title': os.path.basename(file.name)})
+                file_drive.SetContentFile(file.name)
+                file_drive.Upload()
+
+            doc.file_id = file_drive['id'].encode('utf8')
+            os.remove(doc.doc.path)
+            doc.save()
+            print(doc.doc.path)
+            return redirect('show_stu', id=id)
+
+    else:
+        student = Student.objects.get(id=id)
+        form = create_doc_form(Deg_Plan_Doc)
+    return render(request, 'form_upload.html', {
+        'form': form,
+        'student': student,
+    })
+
+
+@conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
+def tamu_download(request, id):
+    g_login = GoogleAuth()
+    g_login.LoadCredentialsFile("mycreds.txt")
+    if g_login.credentials is None:
+        g_login.CommandLineAuth()
+    elif g_login.access_token_expired:
+        g_login.Refresh()
+    else:
+        g_login.Authorize()
+    g_login.SaveCredentialsFile("mycreds.txt")
+    drive = GoogleDrive(g_login)
+    doc = Deg_Plan_Doc.objects.get(id=id)
+    stu_id = doc.stu.id
+    file1 = drive.CreateFile({'id': str(doc.file_id)})
+    file1.GetContentFile(str(doc.doc).split("/")[1])
+    filepath = str(doc.doc).split("/")[1]
+    return serve(request, os.path.basename(filepath), os.path.dirname(filepath))
 
 
 @conditional_decorator(login_required(login_url='/login/'), not settings.DEBUG)
@@ -346,7 +409,7 @@ def students(request, **kwargs):  # uin, first_name, last_name, gender, status, 
         students = students.order_by('uin')
         if not students:
             if search_form_params:
-                return render(request,'NotFind.html')
+                return render(request, 'NotFind.html')
         form = stu_search_form(search_form_params)
         paginator = Paginator(students, 20)  # Show 20 students per page. Use 1 for test.
         page = request.GET.get('page')

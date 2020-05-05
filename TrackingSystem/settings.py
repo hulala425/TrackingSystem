@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gdstorage',
+    # 'gdstorage',
     'KumoGT',
 
 ]
@@ -180,4 +180,4 @@ STATICFILES_FINDERS = (
 # )
 
 
-GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = "united-strategy-275206-f96ca3ce4746.json",
+# GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = "united-strategy-275206-f96ca3ce4746.json",

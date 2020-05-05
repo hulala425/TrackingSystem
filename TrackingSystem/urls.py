@@ -100,6 +100,8 @@ urlpatterns = [
     url(r'^students/doc_upload/(?P<id>\d+)/$', views.doc_upload, name='doc_upload'),
     url(r'^students/doc_remove/(?P<id>\d+)/$', views.doc_remove, name='doc_remove'),
     url(r'^students/advising_note/(?P<id>\d+)/$', views.advising_note, name='advising_note'),
+    url(r'^students/tamu_upload/(?P<id>\d+)/$', views.tamu_upload, name='tamu_upload'),
+    url(r'^students/tamu_download/(?P<id>\d+)/$', views.tamu_download, name='tamu_download'),
     #url(r'^students/advising_note/$', views.advising_note, name='advising_note'),
     # degree docs
     url(r'^degree/(?:(?P<deg_id>\d+)/)degree_plan/(?:(?P<option>[a-z_]+)/)?(?:(?P<id>\d+)/)?$',\

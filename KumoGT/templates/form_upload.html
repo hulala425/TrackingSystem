@@ -27,14 +27,14 @@
     <td align="left">{{deg_plan_doc.doc_type}}</td>
     <td align="left">{{deg_plan_doc.deg_type}}</td>
     <td class="w3-padding-16">
-        <a href="{{deg_plan_doc.doc.url}}">
+       <a href="{% url 'tamu_download' deg_plan_doc.id %}">
             <button type="button" class="w3-button w3-theme-d5">Link</button>
         </a>
     </td>
     <td class="w3-padding-16">
         <form method="POST" action="{% url 'doc_remove' id=deg_plan_doc.id %}">
         {% csrf_token %}
-            <button type="bubmit" class="w3-button w3-red">Del</button>
+            <button type="submit" class="w3-button w3-red">Del</button>
         </form>
     </td>
     <td> </td>
