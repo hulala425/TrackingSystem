@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^k=sr#6vw7&+huh-q*a7e1(e3)^4$=(xf+u^fw4$y_b70!s*07'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["localhost", "192.168.0.121",
                  "127.0.0.1", 'united-strategy-275206.uc.r.appspot.com']
@@ -91,36 +91,43 @@ EMAIL_BACKEND = 'TrackingSystem.email_backend.SendGridEmailpipBackEnd'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
-    #print("in gae")
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '/cloudsql/united-strategy-275206:us-central1:godblesswuhan',
-            'USER': 'root',
-            'PASSWORD': 'GodBlessWuhan',
-            'NAME': 'TrackingSystem',
-        }
+# if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
+#     # Running on production App Engine, so connect to Google Cloud SQL using
+#     # the unix socket at /cloudsql/<your-cloudsql-connection string>
+#     #print("in gae")
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'HOST': '/cloudsql/united-strategy-275206:us-central1:godblesswuhan',
+#             'USER': 'root',
+#             'PASSWORD': 'GodBlessWuhan',
+#             'NAME': 'TrackingSystem',
+#         }
+#     }
+# else:
+#     # Running locally so connect to either a local MySQL instance or connect to
+#     # Cloud SQL via the proxy. To start the proxy via command line:
+#     #
+#     #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
+#     #
+#     # See https://cloud.google.com/sql/docs/mysql-connect-proxy
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'HOST': '127.0.0.1',
+#             'PORT': '3306',
+#             'NAME': 'TrackingSystem',
+#             'USER': 'root',
+#             'PASSWORD': 'GodBlessWuhan',
+#         }
+#     }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-else:
-    # Running locally so connect to either a local MySQL instance or connect to
-    # Cloud SQL via the proxy. To start the proxy via command line:
-    #
-    #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
-    #
-    # See https://cloud.google.com/sql/docs/mysql-connect-proxy
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
-            'NAME': 'TrackingSystem',
-            'USER': 'root',
-            'PASSWORD': 'GodBlessWuhan',
-        }
-    }
+}
 
 
 # Password validation

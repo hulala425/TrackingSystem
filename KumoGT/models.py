@@ -91,11 +91,12 @@ class Qual(models.Model):
 
 
 class Document(models.Model):
-    doc = models.FileField(upload_to='documents/', storage=gd_storage, verbose_name='Document')
+    doc = models.FileField(upload_to='documents/', verbose_name='Document')
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name='Uploaded at')
     notes = models.CharField(max_length=511, blank=True, verbose_name='Notes')
     deg_type = models.CharField(max_length=63, choices=DEGREE_TYPE,
-                                default='none', verbose_name='Degree')
+                                default='none', verbose_name='Deg_type')
+    degree = models.ForeignKey(Degree, models.CASCADE, verbose_name='Degree')
 
     class Meta:
         abstract = True
